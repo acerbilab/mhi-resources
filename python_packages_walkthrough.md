@@ -1,6 +1,6 @@
 # Steps and tips for publishing Python packages on PyPI and `conda-forge`
 
-Written by [Bobby Huggins](https://github.com/orgs/acerbilab/people/Bobby-Huggins), with contributions from [Gurjeet Singra Singh](https://github.com/GurjeetSinghSangra).
+Written by [Bobby Huggins](https://github.com/orgs/acerbilab/people/Bobby-Huggins), with contributions from [Gurjeet Sangra Singh](https://github.com/GurjeetSinghSangra).
 
 ## Publishing on PyPI
 
