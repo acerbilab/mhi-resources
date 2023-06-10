@@ -7,7 +7,7 @@ Written by [Bobby Huggins](https://github.com/orgs/acerbilab/people/Bobby-Huggin
 Publishing a package on PyPI is generally simpler than publish on `conda-forge`, and it’s easiest to use the PyPI package as the source for a `conda-forge` recipe anyway, so it’s best to start here. More details can be found [here](https://realpython.com/pypi-publish-python-package/).
 
 1. Make sure your package dependencies are all correctly specified, e.g. by creating a new Conda environment and running `pip install -e .` from an up-to-date source and ensuring that all tests pass. Dependencies should be specified with a lower bound, rather than pinned to a specific version, for maximum compatibility.
-   - There are a few different ways to specify project dependencies, but the most modern is with a [`pyproject.toml`](https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/#) file in the root of the project directory. This is what I used for PyVBMC and GPyReg, this guide may need to be adapted if you are using a different method. From what I understand, it is also good practice to leave a “stub” in setup.py for backwards compatibility, as in [here](https://github.com/acerbilab/pyvbmc/blob/main/setup.py).
+   - There are a few different ways to specify project dependencies, but the most modern is with a [`pyproject.toml`](https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/#) file in the root of the project directory. This is what we have used for PyVBMC and GPyReg, this guide may need to be adapted if you are using a different method. From what I understand, it is also good practice to leave a “stub” in setup.py for backwards compatibility, as in [here](https://github.com/acerbilab/pyvbmc/blob/main/setup.py).
 2. Make sure `pyproject.toml` contains the appropriate lines. These are taken from PyVBMC, so they may not all be required for your project, but this is a starting point. You may also already have a `pyproject.toml` with other information in it, such as configurations for the [Black formatter](https://black.readthedocs.io/en/stable/). That's fine, those sections can remain.
 ```python
 # pyproject.toml
@@ -63,27 +63,27 @@ requires = [
 build-backend = "setuptools.build_meta"
 ```
    - `setuptools_scm` is a tool which extracts versioning info from Git tags, so that you don't have to manually specify package versions.
-1. Tag the current commit as a release version with
+3. Tag the current commit as a release version with
 ```shell
 git tag vX.Y.Z
 ```
-See [here](https://py-pkgs.org/07-releasing-versioning.html) for some details about semantic versioning.
-3. Install Python build tools. It's probably a good idea to create a new environment for the whole build and packaging process.
+See [here](https://py-pkgs.org/07-releasing-versioning.html) for some details about semantic versioning.  
+4. Install Python build tools. It's probably a good idea to create a new environment for the whole build and packaging process.
 ```shell
 conda create -n build-env  # optional, but recommended
 conda activate build-env # if you created build-env, otherwise make sure you have activated your environment
 pip install setuptools-scm
 pip install build
 pip install twine
-```
-4. Build your package:
+```  
+5. Build your package:
 ```shell
 python -m build
 ```
-(from the project directory)
-5. This should create a directory `dist/` with `.whl` and `.tar.gz` files matching your package name and tagged version. Inspect these files and make sure that they contain the contents you expect. By default this should be the source directory corresponding to your project's name, e.g. `/pyvbmc`. If you are missing files that should be there, then see the link above (https://setuptools.pypa.io/en/latest/userguide/datafiles.html) regarding `package-data` and `MANIFEST.in`.
-5. You can also run `twine check dist/*` to ensure that the package name and description will render properly on PyPI.
-6. If everything looks correct, test out the build by creating a new environment and running `pip install dist/*.whl` to install the packaged version and test it out. For example, you could run the tests with `pytest --pyargs your-package` (do this from somewhere *outside* the   project directory, to ensure that `pytest` is finding the version you just installed, and not the local tests). You could also open a Python REPL and just ensure that your package imports. You may need to open a new shell before the installation can be found on your path.
+(from the project directory)  
+6. This should create a directory `dist/` with `.whl` and `.tar.gz` files matching your package name and tagged version. Inspect these files and make sure that they contain the contents you expect. By default this should be the source directory corresponding to your project's name, e.g. `/pyvbmc`. If you are missing files that should be there, then see the link above (https://setuptools.pypa.io/en/latest/userguide/datafiles.html) regarding `package-data` and `MANIFEST.in`.  
+7. You can also run `twine check dist/*` to ensure that the package name and description will render properly on PyPI.  
+8. If everything looks correct, test out the build by creating a new environment and running `pip install dist/*.whl` to install the packaged version and test it out. For example, you could run the tests with `pytest --pyargs your-package` (do this from somewhere *outside* the   project directory, to ensure that `pytest` is finding the version you just installed, and not the local tests). You could also open a Python REPL and just ensure that your package imports. You may need to open a new shell before the installation can be found on your path.
 ```shell
 conda create -n test-package-release
 conda activate test-package-release
@@ -91,14 +91,14 @@ pip install dist/*.whl
 cd ~ # Test the build package outside the working directory. 
 pytest --pyargs your-package
 # Ensure later to come back to the project working directory
-```
-7. If everything checks out and you are ready to upload, first head to https://test.pypi.org/ and register an account if you don't already have one. Then you can test uploading your package by running `twine upload --repository testpypi dist/*` from the project directory. Your package should then be visible under your account on the test repository, and you can make sure that the description and other info are correct. You can also attempt to install it with
+```  
+9. If everything checks out and you are ready to upload, first head to https://test.pypi.org/ and register an account if you don't already have one. Then you can test uploading your package by running `twine upload --repository testpypi dist/*` from the project directory. Your package should then be visible under your account on the test repository, and you can make sure that the description and other info are correct. You can also attempt to install it with
 ```shell
 python3 -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ your-package
 ```
-The `--extra-index-url`tells `pip` to also look at the regular PyPI repository, which is important if your package has dependencies which are not on the test repo (this is likely the case).
-8. If everything looks good on the test repository, you can run `twine upload dist/*` to upload to the official repository (you will need an account there as well, separate from your test account). Be aware that while a version of a package can be deleted from PyPI (so that it is no longer available), that same version number can never be re-uploaded. So it pays to double-check.
-9. Once uploaded, you should be able to run `pip install your-package`!
+The `--extra-index-url`tells `pip` to also look at the regular PyPI repository, which is important if your package has dependencies which are not on the test repo (this is likely the case).  
+10. If everything looks good on the test repository, you can run `twine upload dist/*` to upload to the official repository (you will need an account there as well, separate from your test account). Be aware that while a version of a package can be deleted from PyPI (so that it is no longer available), that same version number can never be re-uploaded. So it pays to double-check.  
+11. Once uploaded, you should be able to run `pip install your-package`!
 
 ### Other notes:
 
@@ -110,9 +110,9 @@ The `--extra-index-url`tells `pip` to also look at the regular PyPI repository, 
 Uploading to `conda-forge` is slightly more involved. Detailed instructions can be found [here](https://conda-forge.org/docs/maintainer/adding_pkgs.html), but here is a summary of steps:
 
 1. Fork the `conda-forge` [staged-recipes](https://github.com/conda-forge/staged-recipes) repository from GitHub, and clone the fork locally. Checkout a new branch, e.g. `pyvbmc-recipe`, then `cd` into the `staged-recipes/recipes/` directory.
-1. Install `grayskull` with `pip install grayskull` (or `conda install -c conda-forge grayskull`). Grayskull is a utility which will help generate the appropriate metadata for your package.
-2. If your package is already on PyPI, you can run `grayskull pypi --strict-conda-forge your-package` to generate a `conda-forge` recipe for your package. It should create the file `staged-recipes/recipes/your-package/meta.yaml`.
-1. Everything should be filled in automatically (though it's good to double-check), with the exception of
+2. Install `grayskull` with `pip install grayskull` (or `conda install -c conda-forge grayskull`). Grayskull is a utility which will help generate the appropriate metadata for your package.
+3. If your package is already on PyPI, you can run `grayskull pypi --strict-conda-forge your-package` to generate a `conda-forge` recipe for your package. It should create the file `staged-recipes/recipes/your-package/meta.yaml`.
+4. Everything should be filled in automatically (though it's good to double-check), with the exception of
 ```yaml
 |about:
 |  home: https://acerbilab.github.io/pyvbmc/
@@ -123,7 +123,7 @@ Uploading to `conda-forge` is slightly more involved. Detailed instructions can 
 |    - AddYourGitHubIdHere
 ```
 (ignore the vertical bars, Colab won't let me include leading spaces without them). You can also add other people as recipe maintainers, with their permission. It just means they will receive automated PRs and other updates regarding the project from `conda-forge`, and possibly answer any questions that pop up.
-1. Optionally, you can add documentation and development URLs to the `about:` section, e.g.
+5. Optionally, you can add documentation and development URLs to the `about:` section, e.g.
 ```yaml
 |about:
 |  home: https://acerbilab.github.io/pyvbmc/
@@ -134,12 +134,12 @@ Uploading to `conda-forge` is slightly more involved. Detailed instructions can 
 |  ...
 ```
 
-1. Optionally, you can include commands in the `test` section of the `meta.yaml` recipe, which will be automatically run when `conda-forge` updates the package. The `pyvbmc` test suite is quite expensive to run, so I elected to just include the default basic tests here, which just ensure that the package can be imported.
-1. Once you think everything is correct (see a checklist [here](https://conda-forge.org/docs/maintainer/adding_pkgs.html#checklist)), you can commit the changes to your new branch, push them to GitHub, and then open a PR to merge your fork to the original `staged-recipes` repo. Fill out the template checklist which appears when you draft the PR.
-1. Once you've opened the PR, the `conda-forge` automation will check your recipe and attempt to install the package. Correct any errors that occur, and comment on GitHub with `@conda-forge-admin, please restart ci` to re-run the automated checks.
-2. Once the automated checks all pass, you can ping a member of the `conda-forge` team to review and approve the PR with `@conda-forge-admin, please ping conda-forge/help-python`.
-3. After the PR is merged, it will take a few hours (and possibly up to 24) for the package to become available on the Conda servers. After that `conda install --channel=conda-forge your-package` should work!
-1. A repo will be created at `conda-forge/your-package-feedstock`, and you and any other recipe maintainers will be added to it. This is where automated PRs regarding your package will be issued. 
+6. Optionally, you can include commands in the `test` section of the `meta.yaml` recipe, which will be automatically run when `conda-forge` updates the package. The `pyvbmc` test suite is quite expensive to run, so I elected to just include the default basic tests here, which just ensure that the package can be imported.
+7. Once you think everything is correct (see a checklist [here](https://conda-forge.org/docs/maintainer/adding_pkgs.html#checklist)), you can commit the changes to your new branch, push them to GitHub, and then open a PR to merge your fork to the original `staged-recipes` repo. Fill out the template checklist which appears when you draft the PR.
+8. Once you've opened the PR, the `conda-forge` automation will check your recipe and attempt to install the package. Correct any errors that occur, and comment on GitHub with `@conda-forge-admin, please restart ci` to re-run the automated checks.
+9. Once the automated checks all pass, you can ping a member of the `conda-forge` team to review and approve the PR with `@conda-forge-admin, please ping conda-forge/help-python`.
+10. After the PR is merged, it will take a few hours (and possibly up to 24) for the package to become available on the Conda servers. After that `conda install --channel=conda-forge your-package` should work!
+11. A repo will be created at `conda-forge/your-package-feedstock`, and you and any other recipe maintainers will be added to it. This is where automated PRs regarding your package will be issued. 
 
 ## Updating the package version
 
