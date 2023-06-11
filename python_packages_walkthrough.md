@@ -147,7 +147,7 @@ Fortunately, this part is simple.
 
 - **Updating the version on PyPI:**
 
-  Re-run steps 3-5 from the first section above, and upload the new `.whl` and `.tar.gz` files to PyPI with `twine`. 
+  Re-run steps 3-5 from the section [Publishing on PyPI](#publishing-on-pypi) above, and upload the new `.whl` and `.tar.gz` files to PyPI with `twine`. 
 
 - **Updating the version on `conda-forge`:**
 
