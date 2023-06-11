@@ -145,12 +145,12 @@ Uploading to `conda-forge` is slightly more involved. Detailed instructions can 
 
 Fortunately, this part is simple. 
 
-### Updating the version on PyPI
+- **Updating the version on PyPI:**
 
-Re-run steps 3-5 from the first section above, and upload the new `.whl` and `.tar.gz` files to PyPI with `twine`. 
+  Re-run steps 3-5 from the first section above, and upload the new `.whl` and `.tar.gz` files to PyPI with `twine`. 
 
-### Updating the version on `conda-forge`
+- **Updating the version on `conda-forge`:**
 
-After the package becomes available on PyPI, `conda-forge` should automatically find the new version (this might take a few hours). After that, the `conda-forge` process will automatically issue a PR to the feedstock repo, which a recipe maintainer can approve in order to update the `conda-forge` version. After approval, the binary on the `conda-forge` cloud/repo will be automatically updated within 24 hours.
+  After the package becomes available on PyPI, `conda-forge` should automatically find the new version (this will take a few hours). After that, the `conda-forge` process will automatically issue a PR to the feedstock repo, which a recipe maintainer can approve in order to update the `conda-forge` version. After approval, the binary on the `conda-forge` cloud/repo will be automatically updated within 24 hours.
 
 
