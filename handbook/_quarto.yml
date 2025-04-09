@@ -1,0 +1,43 @@
+project:
+  type: book
+
+book:
+  title: "Lab Handbook"
+  author: "Machine and Human Intelligence group, University of Helsinki"
+  date: last-modified
+  repo-url: https://github.com/acerbilab/handbook
+  repo-actions: [edit]
+  chapters:
+    - index.qmd
+    - part: Python tools
+      chapters:
+        - packaging.qmd
+    - part: HPC resources
+      chapters:
+        - hpc_intro.qmd
+        - hpc_commands.qmd
+    - part: Research topics
+      chapters:
+        - gp_and_bo.qmd
+        - seminars.qmd
+        - mlcs_guide.qmd
+    - part: Other info
+      chapters:
+        - contributing.qmd
+    - references.qmd
+
+number-depth: 1
+
+bibliography: references.bib
+execute:
+  freeze: auto
+  
+format:
+  html:
+    theme: cosmo
+    number-sections: false
+  pdf:
+    documentclass: scrreprt
+
+
+

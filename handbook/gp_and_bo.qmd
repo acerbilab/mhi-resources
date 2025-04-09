@@ -1,0 +1,28 @@
+---
+date: "2024-01-26"
+date-modified: last-modified
+author:
+  - name: Luigi Acerbi
+  - name: Chengkun Li
+---
+
+# Resources for Gaussian processes and Bayesian optimization
+
+### Gaussian Processes
+
+- **Gortler et al. (2019)**. A Visual Exploration of Gaussian Processes. [Distill](https://distill.pub/2019/visual-exploration-gaussian-processes/)
+- **Videos and tutorials** from the Gaussian Process Summer School: [GPSS 2021 Program](http://gpss.cc/gpss21/program)  
+  - Start with the first video, "Intro to GPs", and the sessions on "Kernel Design" and "Representation Learning with GPs" (other videos can be explored later as time permits).
+- **Tutorials/workshops (Jupyter notebooks)**: [GPSS 2021 Labs](http://gpss.cc/gpss21/labs)
+- **The GP Bible** by @rasmussen2006gaussian: [Gaussian Processes for Machine Learning](http://www.gaussianprocess.org/gpml/chapters/RW.pdf)
+
+### Bayesian Optimization
+
+- **Exploring Bayesian Optimization** [@agnihotri2020exploring]. [Distill](https://distill.pub/2020/bayesian-optimization/)
+- **Frazier (2018)**. A Tutorial on Bayesian Optimization. [arXiv](https://arxiv.org/abs/1807.02811)
+- **Video**: "Introduction to Bayesian Optimization" from the Gaussian Process Summer School, Day 3: [GPSS 2021 Day 3](http://gpss.cc/gpss21/day-3.html)
+- **The Bayesian Optimization Book** by @garnett_bayesoptbook_2023: [BayesOptBook](https://bayesoptbook.com/)
+
+### Slack Channel
+
+- Join and check out the **#gaussian-processes** channel on the lab Slack.

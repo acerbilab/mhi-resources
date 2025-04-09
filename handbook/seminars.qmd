@@ -1,0 +1,16 @@
+---
+title: Seminars
+date: "2024-11-06"
+date-modified: last-modified
+author:
+  - name: Chengkun Li
+  - name: Luigi Acerbi
+---
+
+## Ongoing
+- [Machine Learning Coffee seminars](https://fcai.fi/machine-learning-coffee-seminar)
+- [Aalto Seminar on Advances in Probabilistic Machine Learning [APML]](https://aaltoml.github.io/apml/)
+- [Seminar on Gaussian Processes, Spatiotemporal Modeling, and Decision-making Systems](https://gp-seminar-series.github.io/)
+
+## Interesting Channels
+- [Secondmind Labs Research seminars](https://www.youtube.com/playlist?list=PLzFvBxVoO1ly1QJoPw7dbCG8x-q-IOF2I)

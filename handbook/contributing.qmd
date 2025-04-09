@@ -1,0 +1,64 @@
+---
+date: "2024-11-06"
+date-modified: last-modified
+author:
+  - name: Chengkun Li
+---
+
+# Contributing Guide
+
+Here are the detailed steps to ensure a smooth workflow. **It's simply editting the `.qmd` file and making pull requests on GitHub**. So don't be scared 😉.
+
+## Steps to Contribute
+
+1. **Fork the Repository**  
+   Visit the [handbook repository](https://github.com/acerbilab/handbook) and click on "Fork" to create a copy of the repository under your GitHub account.
+
+2. **Clone the Repository**  
+   Clone your fork to your local machine:
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/handbook.git
+   cd handbook
+   ```
+
+3. **Create a New Branch**  
+   Before making changes, create a new branch to keep your work organized:
+   ```bash
+   git checkout -b your-branch-name
+   ```
+
+4. **Add or Modify Content**  
+   - Write or edit a `(q)markdown` file as needed.
+   - If you're adding a new chapter, create a new `.qmd` file, then include it under the `book: chapters:` field in [_quarto.yml](https://github.com/acerbilab/handbook/blob/main/_quarto.yml). For example:
+    ```yaml
+     book:
+       chapters:
+         - index.qmd
+         - part: Python tools
+           - your-new-chapter.qmd
+     ```
+
+5. **Preview Locally**
+   
+   To see your changes before pushing, build and preview the book locally. You could use for example VSCode as the editor and Quarto has a VSCode plugin to help preview the book website locally, see instructions [here](https://quarto.org/docs/tools/vscode.html).
+   
+   Or make sure you have Quarto installed, then run in bash terminal:
+   ```bash
+   quarto preview
+   ```
+   This will open a live preview in your browser where you can verify your changes.
+
+6. **Commit and Push Changes**  
+   After making sure your changes look good, commit and push them to your fork:
+   ```bash
+   git add .
+   git commit -m "Brief description of your changes"
+   git push origin your-branch-name
+   ```
+
+7. **Make a Pull Request**  
+   Go to the original [handbook repository](https://github.com/acerbilab/handbook) and open a Pull Request from your branch. Provide a brief summary of your changes and mention any specific details reviewers should be aware of.
+
+## Additional Resources
+
+For more advanced features and customization options, please refer to the [Quarto documentation](https://quarto.org/docs/books/).

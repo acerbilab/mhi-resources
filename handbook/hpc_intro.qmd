@@ -1,0 +1,29 @@
+---
+date: "2024-11-06"
+date-modified: last-modified
+author:
+  - name: Luigi Acerbi
+  - name: Chengkun Li
+  - name: Paul Chang
+---
+
+# Introduction
+
+Whenever doing research, High Performance Computing (HPC) access and usage is fundamental, you will rarely be running things only on a local machine. The main HPC resources we can use are [CSC](https://docs.csc.fi/) and [UH's Turso](https://version.helsinki.fi/it-for-science/hpc/-/wikis/home).
+
+## CSC
+The CSC is in charge of Finland's national computational resources. Many storage and computing programmes exist here, but the main ones for running ML experiments are Lumi, Mahti, and Puhti. 
+
+- Mahti and Puhti are considered the same project resource. When you get approved for a project, you can use either to run. The Mahti partition contains 24 GPU nodes, each equipped with four NVIDIA A100 GPUs. The Puhti partition includes 80 GPU nodes, each featuring four NVIDIA Volta V100 GPUs.
+
+- Lumi is separate from Mahti and Puhti and has a separate project approval process. It contains 2,978 nodes, each equipped with four AMD Instinct MI250X GPUs, totaling 11,912 GPUs, considered one of Europe's largest supercomputers
+
+
+
+## HPC tutorials
+This is a [tutorial on HPC usage](https://scicomp.aalto.fi/training/scip/summer-kickstart/) held in June 2021 by Aalto University, very useful. The videos are [here](https://scicomp.aalto.fi/training/scip/summer-kickstart/).
+
+[HPC user guide for UH](https://version.helsinki.fi/it-for-science/hpc/-/wikis/home). They have [support sessions](https://version.helsinki.fi/it-for-science/hpc/-/wikis/Garage) organized every day if you have any questions or need any help with HPC usage.
+
+
+Slack channel: Join and check out the **#hpc** channel on the lab Slack.

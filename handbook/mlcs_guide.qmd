@@ -1,0 +1,114 @@
+---
+title: Machine Learning Coffee Seminar organizing guide
+date: "2024-11-13"
+date-modified: last-modified
+author:
+  - name: Ulpu Remes
+  - name: Chengkun Li
+  - name: Petrus Mikkola
+---
+
+## Prerequisites
+
+To organize the ML seminar, ensure you have the following access and resources:
+
+- **University of Helsinki user account**
+- **Key to Computer Science Department** to access room A318
+
+Before beginning your tasks, complete these access requests:
+
+1. **FCAI Squarespace and YouTube channel access**: Contact Kaisa Pekkala (kaisa.pekkala@aalto.fi).
+2. **FCAI speakers and participants documents**: Request access from Luigi.
+3. **Zoom Meeting Ownership**: Request ownership transfer from the previous organizer.
+
+### Zoom Meeting Ownership Transfer
+
+1. Sign in to Zoom with your University of Helsinki account.
+2. Go to **Settings → Meetings**.
+3. Scroll to the bottom and select **Schedule Privilege** → **Edit and Add**.
+4. Enter the previous owner's university email and select their name.
+5. Ask the previous owner to transfer room ownership to you:
+   - They should go to Zoom, locate **MLCS Kumpula** under **Meetings**, choose **Edit and Schedule For**, select your name, and save.
+   - [More information on Zoom ownership transfer](https://agsci.psu.edu/it/how-to/pass-ownership-of-a-zoom-meeting-or-webinar-to-another-person).
+
+---
+
+## Tasks
+
+### Pre-Seminar Tasks
+
+1. **Create Event on Squarespace**:
+   - Duplicate an existing event if preferred, but update **Options → Event URL** to reflect the new event.
+
+2. **Send Advertising Email**:
+   - Confirm with the ML seminar team (mlseminar@hiit.fi) that the announcement has been sent.
+
+3. **Reserve Microphone**:
+   - Reserve a **Blackstorm Scout USB microphone** from IT support (helpdesk@helsinki.fi).
+
+4. **Print Attendance List**
+
+---
+
+## Seminar Day Checklist
+
+### Equipment Setup
+
+1. **Get Equipment**:
+   - Pick up the **Blackstorm Scout microphone** (USB) from IT support (the microphone is stored in room A216, has black and purple box).
+   - Retrieve the **Owl camera** from meeting room A318 (stored in a white box on the side table by the door).
+
+2. **Classroom Setup**:
+   Setting up the classroom for the hybrid seminar (in-person and Zoom attendees) can be tricky so ensure to test in advance for the first time. There are two main setups to consider:
+
+    - **Using your own laptop without the classroom computer**:
+      - Connect the microphone and Owl camera to your laptop. You could test in advance to ensure they work with your laptop.
+      - Position the Owl camera on the table in front of the podium.
+      - Start the Zoom meeting from your laptop
+      - Let the speaker join the Zoom meeting from their laptop, muting the speaker's laptop microphone and turning off the camera. The speaker should use the microphone connected to your laptop.
+      - Connect the speaker's laptop to the projector and share their screen. 
+      - If the projector doesn't work with the speaker's laptop, you can connect your laptop for sharing the speaker's screen, which is less ideal since it will have some Zoom toolbar visible on the screen.
+      - **Start recording** in Zoom.
+   - **Using the classsroom computer**:
+     - Connect the microphone and Owl camera to the classroom computer. Some classroom computers might not work well, so you might need to use your laptop instead. See the previous setup for details.
+     - Start the projector.
+     - Start the Zoom meeting from your laptop.
+     - Let the speaker join the Zoom meeting from their laptop.
+     - Log into Zoom from the classroom computer (you'll need the university account for login) and share the meeting to the projector screen.
+     - **Start recording** in Zoom
+
+
+### Zoom Meeting Management
+
+1. Record the session on your laptop.
+2. Monitor Zoom chat and read questions aloud if needed.
+3. Note the number of Zoom attendees.
+
+### Attendance Tracking
+
+- Circulate the attendance list and a pen once the talk begins.
+- Make a note of the Zoom attendance count.
+
+---
+
+## Post-Seminar Tasks
+
+1. **Return Equipment**:
+   - Return the microphone and Owl camera to their respective storage locations.
+
+2. **Handle Leftover Food**:
+   - Move any leftover food to the coffee room on the second floor of the CS department.
+
+3. **Record Attendance**:
+   - Update the attendance in the FCAI participants document.
+
+4. **Edit and Upload Video**:
+   - Use QuickTime or a similar tool for video editing.
+   - Upload the edited video to YouTube.
+
+### YouTube Upload Instructions
+
+1. **Title**: Use the title from the event information.
+2. **Description**: Include the abstract and speaker details from the event information.
+3. **Playlist**: Add the video to the **Machine Learning Coffee Seminar** playlist.
+4. **Audience**: Set the audience to **not made for kids**.

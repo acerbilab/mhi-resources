@@ -1,0 +1,3 @@
+# Introduction {.unnumbered}
+
+Lab handbook of the [Machine and Human Intelligence group](https://www.helsinki.fi/en/researchgroups/machine-and-human-intelligence) at the University of Helsinki.

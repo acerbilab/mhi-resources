@@ -1,0 +1,21 @@
+---
+date: "2024-11-12"
+date-modified: last-modified
+author:
+  - name: Chengkun Li
+---
+# Useful commands
+
+## Squeue
+Check the status of submitted slurm jobs.
+```bash
+squeue -u $USER --format="%.18i %.9P %.8j %.8u %.8T %.10M %.20S %.9l %.6D %R %.10m"
+```
+
+For convenience, you could set the default by writing the following lines in your `.bashrc` or `.bash_profile` and then simply call `squeue`.
+```bash
+alias squeue='squeue -u $USER'
+export SQUEUE_FORMAT="%.18i %.9P %.8j %.8u %.8T %.10M %.20S %.9l %.6D %R %.10m"
+```
+
+See the [squeue manual](https://slurm.schedmd.com/squeue.html#OPT_format) for more options.
