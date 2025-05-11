@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Normalizing Flow Regression for Bayesian Inference | NFR Project Page
+    </title>
+    <meta
+      name="description"
+      content="Project page for the paper 'Normalizing Flow Regression for Bayesian Inference with Offline Likelihood Evaluations' by Li, Huggins, Mikkola, Acerbi (AABI 2025)"
+    />
+    <meta
+      property="og:title"
+      content="Normalizing Flow Regression for Bayesian Inference with Offline Likelihood Evaluations"
+    />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:description"
+      content="This website contains information about normalizing flow regression, a novel method for Bayesian inference that uses normalizing flows as regression models for approximating posterior distributions from existing log-density evaluations."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [
+            ["$", "$"],
+            ["\\(", "\\)"],
+          ],
+          displayMath: [
+            ["$$", "$$"],
+            ["\\[", "\\]"],
+          ],
+          processEscapes: true,
+          processEnvironments: true,
+        },
+        options: {
+          ignoreHtmlClass: "tex2jax_ignore",
+          processHtmlClass: "tex2jax_process",
+        },
+      };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+  </head>
+  <body>
+    <div class="header">
+      <h1>
+        Normalizing Flow Regression for Bayesian Inference with Offline
+        Likelihood Evaluations
+      </h1>
+      <div class="authors">
+        Chengkun Li<sup>1</sup>, Bobby Huggins<sup>2</sup>, Petrus
+        Mikkola<sup>1</sup>, Luigi Acerbi<sup>1</sup>
+      </div>
+      <div class="affiliations">
+        <sup>1</sup>Department of Computer Science, University of Helsinki<br />
+        <sup>2</sup>Department of Computer Science and Engineering, Washington
+        University in St. Louis
+      </div>
+      <div class="conference">
+        7th Symposium on Advances in Approximate Bayesian Inference (AABI) -
+        Proceedings track, 2025
+      </div>
+      <div class="resources">
+        <a
+          href="https://github.com/acerbilab/normalizing-flow-regression"
+          class="btn"
+          aria-label="View source code on GitHub"
+          title="View the paper codebase on GitHub"
+          ><span>Code</span></a
+        >
+        <a
+          href="https://arxiv.org/abs/2504.11554"
+          class="btn"
+          aria-label="Read paper on arXiv"
+          title="Read the paper on arXiv"
+          ><span>Paper</span></a
+        >
+        <a
+          href="https://twitter.com/AcerbiLuigi/status/1234567890"
+          class="btn"
+          aria-label="Read social thread"
+          title="Read the paper thread"
+          ><span>Social</span></a
+        >
+        <a
+          href="https://github.com/acerbilab/pubs-llms/tree/main/papers/li2025normalizing"
+          class="btn"
+          aria-label="View paper in Markdown"
+          title="Retrieve paper parts in Markdown (easy format for LLMs)"
+          ><span>Markdown</span></a
+        >
+      </div>
+    </div>
+
+    <div class="tldr">
+      <h3>TL;DR</h3>
+      <p>
+        We propose <strong>Normalizing Flow Regression (NFR)</strong>, a novel
+        offline inference method for approximating Bayesian posterior
+        distributions using existing log-density evaluations. Unlike traditional
+        surrogate approaches, NFR directly yields a tractable posterior
+        approximation through regression on existing evaluations, without
+        requiring additional sampling or inference steps. Our method performs
+        well on both synthetic benchmarks and real-world applications from
+        neuroscience and biology, offering a promising approach for Bayesian
+        inference when standard methods are computationally prohibitive.
+      </p>
+    </div>
+
+    <!-- prettier-ignore -->
+    <div class="citation">
+    @article{li2025normalizing,
+      title={Normalizing Flow Regression for Bayesian Inference with Offline Likelihood Evaluations},
+      author={Li, Chengkun and Huggins, Bobby and Mikkola, Petrus and Acerbi, Luigi},
+      journal={7th Symposium on Advances in Approximate Bayesian Inference (AABI) - Proceedings track},
+      year={2025}
+    }
+    </div>
+
+    <h2>Introduction</h2>
+    <p>
+      Bayesian inference with computationally expensive likelihood evaluations
+      remains a significant challenge in many scientific domains. When model
+      evaluations are costly - for instance, involving extensive numerical
+      methods or simulations - standard Bayesian approaches like Markov chain
+      Monte Carlo (MCMC) or variational inference (VI) become impractical, as
+      they require numerous evaluations of the target density.
+    </p>
+    <p>
+      Due to these computational demands, practitioners often resort to simpler
+      alternatives such as maximum a posteriori (MAP) estimation. While these
+      point estimates can provide useful insights, they fail to capture
+      parameter uncertainty, potentially leading to overconfident or biased
+      conclusions.
+    </p>
+    <p>
+      Recent advances in surrogate modeling present promising alternatives for
+      addressing these challenges. Costly likelihood or posterior density
+      functions can be efficiently approximated via surrogates such as Gaussian
+      processes (GPs). However, these approaches share a key limitation: the
+      obtained surrogate model does not directly provide a valid probability
+      distribution. Additional steps, such as performing MCMC or variational
+      inference on the surrogate, are needed to yield tractable posterior
+      approximations.
+    </p>
+
+    <div class="highlight">
+      <h3>Our Contribution</h3>
+      <p>
+        We propose <strong>Normalizing Flow Regression (NFR)</strong>, a novel
+        offline inference method that directly yields a tractable posterior
+        approximation through regression on existing log-density evaluations.
+        Unlike other surrogate methods, NFR directly produces a posterior
+        distribution that is easy to evaluate and sample from.
+      </p>
+      <p>
+        NFR efficiently recycles existing log-density evaluations (e.g., from
+        MAP optimizations) rather than requiring costly new evaluations from the
+        target model. This makes it particularly valuable in settings where
+        standard Bayesian methods are computationally prohibitive.
+      </p>
+    </div>
+
+    <h2>Background</h2>
+    <h3>Normalizing Flows</h3>
+    <p>
+      Normalizing flows construct flexible probability distributions by
+      iteratively transforming a simple base distribution, typically a
+      multivariate Gaussian. A normalizing flow defines an invertible
+      transformation $T_{\boldsymbol{\phi}}: \mathbb{R}^{D} \rightarrow
+      \mathbb{R}^{D}$ with parameters $\boldsymbol{\phi}$.
+    </p>
+    <p>
+      Let $\mathbf{u} \in \mathbb{R}^{D}$ be a random variable from the base
+      distribution $p_{\mathbf{u}}$. For a random variable
+      $\mathbf{x}=T_{\boldsymbol{\phi}}(\mathbf{u})$, the change of variables
+      formula gives its density as:
+    </p>
+    $$q_{\boldsymbol{\phi}}(\mathbf{x})=p_{\mathbf{u}}(\mathbf{u})\left|\operatorname{det}
+    J_{T_{\boldsymbol{\phi}}}(\mathbf{u})\right|^{-1}, \quad
+    \mathbf{u}=T_{\boldsymbol{\phi}}^{-1}(\mathbf{x}) $$
+    <p>
+      where $J_{T_{\boldsymbol{\phi}}}$ denotes the Jacobian matrix of the
+      transformation. The transformation $T_{\boldsymbol{\phi}}(\mathbf{u})$ is
+      designed to balance expressive power with efficient computation of its
+      Jacobian determinant.
+    </p>
+    <p>
+      In this paper, we use the popular masked autoregressive flow (MAF), which
+      constructs the transformation through an autoregressive process where each
+      component $\mathbf{x}^{(i)}$ depends on previous components through:
+    </p>
+    $$ \mathbf{x}^{(i)}=g_{\text {scale }}\left(\alpha^{(i)}\right) \cdot
+    \mathbf{u}^{(i)}+g_{\text {shift }}\left(\mu^{(i)}\right) $$
+    <p>
+      The autoregressive structure ensures invertibility of the transformation
+      and enables efficient computation of the Jacobian determinant needed for
+      the density calculation.
+    </p>
+
+    <h3>Bayesian Inference</h3>
+    <p>
+      Bayesian inference provides a principled framework for inferring unknown
+      parameters $\mathbf{x}$ given observed data $\mathcal{D}$. From Bayes'
+      theorem, the posterior distribution $p(\mathbf{x} \mid \mathcal{D})$ is:
+    </p>
+    $$ p(\mathbf{x} \mid \mathcal{D})=\frac{p(\mathcal{D} \mid \mathbf{x})
+    p(\mathbf{x})}{p(\mathcal{D})} $$
+    <p>
+      where $p(\mathcal{D} \mid \mathbf{x})$ is the likelihood, $p(\mathbf{x})$
+      is the prior over the parameters, and $p(\mathcal{D})$ is the normalizing
+      constant, also known as evidence or marginal likelihood. This quantity is
+      useful in Bayesian model selection.
+    </p>
+    <p>
+      Two widely used approaches for approximating this posterior are
+      Variational Inference (VI) and Markov Chain Monte Carlo (MCMC). VI turns
+      posterior approximation into an optimization problem by positing a family
+      of parameterized distributions and optimizing over the parameters. MCMC
+      methods aim to draw samples from the posterior by constructing a Markov
+      chain that converges to $p(\mathbf{x} \mid \mathcal{D})$.
+    </p>
+    <p>
+      While both methods offer strengths, they typically require many likelihood
+      evaluations. Due to the large number of required evaluations, both VI and
+      MCMC are often infeasible for black-box models with expensive likelihoods.
+    </p>
+
+    <h3>The Challenge of Offline Inference</h3>
+    <p>
+      For models with computationally expensive likelihood evaluations,
+      practitioners often have limited budgets for model evaluations. This has
+      led to the development of surrogate-based methods that build
+      approximations of the log-likelihood or log-posterior function from a
+      finite set of evaluations.
+    </p>
+    <p>
+      A key challenge with traditional surrogate approaches is that they don't
+      directly yield a proper probability distribution for the posterior.
+      Additional steps, such as running MCMC or VI on the surrogate, are needed
+      to obtain posterior samples or density evaluations. Our approach addresses
+      this limitation by using normalizing flows as regression models that
+      directly provide a tractable posterior approximation.
+    </p>
+
+    <h2>Normalizing Flow Regression</h2>
+    <p>
+      We now present our proposed method, Normalizing Flow Regression (NFR) for
+      approximate Bayesian posterior inference. In the following, we denote with
+      $\mathbf{X}=\left(\mathbf{x}_{1}, \ldots, \mathbf{x}_{N}\right)$ a set of
+      input locations where we have evaluated the target posterior, with
+      corresponding unnormalized log-density evaluations
+      $\mathbf{y}=\left(y_{1}, \ldots, y_{N}\right)$, where $\mathbf{x}_{n} \in
+      \mathbb{R}^{D}$ and $y_{n} \in \mathbb{R}$.
+    </p>
+
+    <h3>Overview of the Regression Model</h3>
+    <p>
+      We use a normalizing flow $T_{\boldsymbol{\phi}}$ with normalized density
+      $q_{\boldsymbol{\phi}}(\mathbf{x})$ to fit $N$ observations of the log
+      density of an unnormalized target $p_{\text{target}}(\mathbf{x})$, using
+      the dataset $\boldsymbol{\Xi}=\left(\mathbf{X}, \mathbf{y},
+      \boldsymbol{\sigma}^{2}\right)$. Let
+      $f_{\boldsymbol{\phi}}(\mathbf{x})=\log q_{\boldsymbol{\phi}}(\mathbf{x})$
+      be the flow's log-density at $\mathbf{x}$. The log-density prediction of
+      our regression model is:
+    </p>
+    $$ f_{\boldsymbol{\psi}}(\mathbf{x})=f_{\boldsymbol{\phi}}(\mathbf{x})+C $$
+    <p>
+      where $C$ is an additional free parameter accounting for the unknown (log)
+      normalizing constant of the target posterior. The parameter set of the
+      regression model is $\boldsymbol{\psi}=(\boldsymbol{\phi}, C)$.
+    </p>
+    <p>
+      We train the flow regression model itself via MAP estimation, by
+      maximizing:
+    </p>
+    $$ \begin{aligned} \mathcal{L}(\boldsymbol{\psi}) & =\log p(\mathbf{y} \mid
+    \mathbf{X}, \boldsymbol{\sigma}^{2}, f_{\boldsymbol{\phi}}, C)+\log
+    p(\boldsymbol{\phi})+\log p(C) \\ & =\sum_{n=1}^{N} \log p\left(y_{n} \mid
+    f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right), \sigma_{n}^{2}\right)+\log
+    p(\boldsymbol{\phi})+\log p(C) \end{aligned} $$
+    <p>
+      where $p\left(y_{n} \mid f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right),
+      \sigma_{n}^{2}\right)$ is the likelihood of observing log-density value
+      $y_{n}$, while $p(\boldsymbol{\phi})$ and $p(C)$ are priors over the flow
+      parameters and log normalizing constant, respectively.
+    </p>
+    <p>
+      Since we only have access to finite pointwise evaluations of the target
+      log-density, the choice of the likelihood function and priors for the
+      regression model is crucial for accurate posterior approximation. We
+      detail these choices in the following sections.
+    </p>
+
+    <div class="highlight">
+      <h3>Key Innovation</h3>
+      <p>
+        Unlike other surrogate methods that approximate the log-density function
+        and require additional sampling or inference steps, our NFR approach
+        directly yields a tractable posterior approximation through regression
+        on existing log-density evaluations.
+      </p>
+      <p>
+        The flow regression model provides both a normalized posterior density
+        that is easy to evaluate and sample from, as well as an estimate of the
+        normalizing constant (model evidence) that can be used for model
+        comparison.
+      </p>
+    </div>
+
+    <h3>Likelihood Function for Log-Density Observations</h3>
+    <p>
+      For each observation $y_{n}$, let $f_{n} \equiv
+      p_{\text{target}}\left(\mathbf{x}_{n}\right)$ denote the true unnormalized
+      log-density value, which our flow regression model aims to estimate via
+      its prediction $f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right)$.
+    </p>
+    <p>A natural first choice would be a Gaussian likelihood:</p>
+    $$ p\left(y_{n} \mid f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right),
+    \sigma_{n}^{2}\right)=\mathcal{N}\left(y_{n} \mid
+    f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right), \sigma_{n}^{2}\right) $$
+    <p>
+      However, this choice has a significant drawback. Since log-density values
+      approach negative infinity as density values approach zero, small errors
+      in near-zero density regions of the target posterior would dominate the
+      regression objective. This would cause the normalizing flow to
+      overemphasize matching these near-zero density observations at the expense
+      of accurately modeling the more important high-density regions.
+    </p>
+
+    <figure>
+      <img
+        src="images/tobit_likelihood.png"
+        alt="Illustration of the censoring effect of the Tobit likelihood on a target density"
+        class="responsive-img"
+      />
+      <figcaption class="caption">
+        Figure 1: Illustration of the censoring effect of the Tobit likelihood
+        on a target density. The left panel shows the density plot, while the
+        right panel displays the corresponding log-density values. The shaded
+        region represents the censored observations with log-density values
+        below $y_{\text{low}}$, where the density is near-zero.
+      </figcaption>
+    </figure>
+
+    <p>
+      To address this issue, we propose a more robust Tobit likelihood for flow
+      regression, inspired by the Tobit model and noise shaping techniques. The
+      Tobit likelihood takes the form:
+    </p>
+    $$ p\left(y_{n} \mid f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right),
+    \sigma_{n}^{2}\right)= \begin{cases} \mathcal{N}\left(y_{n} ;
+    f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right),
+    \sigma_{n}^{2}+s\left(f_{\max }-f_{n}\right)^{2}\right) & \text { if }
+    y_{n}>y_{\text {low }} \\ \Phi\left(\frac{y_{\text {low
+    }}-f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right)}{\sqrt{\sigma_{n}^{2}+s\left(f_{\max
+    }-f_{n}\right)^{2}}}\right) & \text { if } y_{n} \leq y_{\text {low }}
+    \end{cases} $$
+    <p>
+      where $y_{\text{low}}$ represents a threshold below which we censor
+      observed log-density values, $\Phi$ is the standard normal cumulative
+      distribution function (CDF), and $s(\cdot)$ a noise shaping function. When
+      $y_{n} \leq y_{\text{low}}$, the Tobit likelihood only requires the
+      model's prediction $f_{\boldsymbol{\psi}}\left(\mathbf{x}_{n}\right)$ to
+      fall below $y_{\text{low}}$, rather than match $y_{n}$ exactly (see Figure
+      1). The function $s(\cdot)$ acts as a noise shaping mechanism that
+      increases observation uncertainty for lower-density regions, further
+      retaining information from low-density observations without overfitting to
+      them.
+    </p>
+
+    <h3>Prior Settings</h3>
+    <p>
+      The flow regression model's log-density prediction depends on both the
+      flow parameters $\boldsymbol{\phi}$ and the log normalizing constant $C$,
+      leading to a non-identifiability issue. Given a sufficiently expressive
+      flow, alternative parameterizations $(\phi', C')$ can yield identical
+      predictions at observed points. While this suggests the necessity of
+      informative priors for both the flow and the normalizing constant, setting
+      a meaningful prior on $C$ is challenging since the target density
+      evaluations are neither i.i.d. nor samples from the target distribution.
+    </p>
+    <p>
+      Therefore, we focus on imposing sensible priors on the flow parameters
+      $\boldsymbol{\phi}$, which indirectly regularize the normalization
+      constant and avoid the pitfalls of complete non-identifiability.
+    </p>
+
+    <figure>
+      <img
+        src="images/flow_prior.png"
+        alt="Effect of prior variance on normalizing flow behavior"
+        class="responsive-img-large"
+      />
+      <figcaption class="caption">
+        Figure 2: Effect of prior variance on normalizing flow behavior, using a
+        standard Gaussian as the base distribution. The panels show flow
+        realizations with different prior standard deviations: (a) The flow
+        closely resembles the base distribution. (b) The flow exhibits
+        controlled flexibility, allowing meaningful deviations while maintaining
+        reasonable shapes. (c) The flow deviates significantly, producing
+        complex and less plausible distributions.
+      </figcaption>
+    </figure>
+
+    <p>
+      A normalizing flow consists of a base distribution and transformation
+      layers. The base distribution can incorporate prior knowledge about the
+      target posterior's shape, for instance from a moment-matching
+      approximation. In our case, the training data comes from MAP optimization
+      runs on the target posterior. We use a multivariate Gaussian with diagonal
+      covariance as the base distribution, and estimate its mean and variance
+      along each dimension using the sample mean and variance of observations
+      with sufficiently high log-density values.
+    </p>
+    <p>
+      Specifying priors for the flow transformation layers is less
+      straightforward since they are parameterized by neural networks. As a
+      normalizing flow is itself a distribution, setting priors for its
+      transformation layers means defining a distribution over distributions.
+      Our approach is to ensure that the flow stays close to its base
+      distribution a priori, unless the data strongly suggests otherwise. We
+      achieve this by constraining the scaling and shifting transformations
+      using the bounded tanh function:
+    </p>
+    $$ \begin{aligned} g_{\text {scale }}\left(\alpha^{(i)}\right) &
+    =\alpha_{\max }^{\tanh \left(\alpha^{(i)}\right)} \\ g_{\text {shift
+    }}\left(\mu^{(i)}\right) & =\mu_{\max } \cdot \tanh \left(\mu^{(i)}\right)
+    \end{aligned} $$
+    <p>
+      where $\alpha_{\max}$ and $\mu_{\max}$ cap the maximum scaling and
+      shifting transformation, preventing extreme deviations from the base
+      distribution. We then place a Gaussian prior on the flow parameters,
+      $p(\phi)=\mathcal{N}(\phi; \mathbf{0}, \sigma_{\phi}^{2} \mathbf{I})$,
+      with $\sigma_{\phi}$ chosen through prior predictive checks (see Figure
+      2).
+    </p>
+
+    <h3>Annealed Optimization</h3>
+    <p>
+      Fitting a flow to a complex unnormalized target density via direct
+      regression on observations can be challenging due to both the unknown log
+      normalizing constant and potential gradient instabilities during
+      optimization. We found that a more robust approach is to gradually fit the
+      flow to an annealed (tempered) target across training iterations $t=0,
+      \ldots, T_{\max}$, using an inverse temperature parameter $\beta_{t} \in
+      [0,1]$.
+    </p>
+
+    <figure>
+      <img
+        src="images/annealed_optimization.png"
+        alt="Annealed optimization strategy"
+        class="responsive-img-large"
+      />
+      <figcaption class="caption">
+        Figure 3: Annealed optimization strategy. The flow regression model is
+        progressively fitted to a series of tempered observations, with the
+        inverse temperature $\beta$ increasing over multiple training
+        iterations, interpolating between the base and unnormalized target
+        distributions.
+      </figcaption>
+    </figure>
+
+    <p>
+      The tempered target takes the form (see Figure 3 for an illustration):
+    </p>
+    $$ \widetilde{f}_{\beta_{t}}(\mathbf{x})=\left(1-\beta_{t}\right) \log
+    p_{0}(\mathbf{x})+\beta_{t} \log p_{\text {target }}(\mathbf{x}) $$
+    <p>
+      where $p_{0}(\mathbf{x})$ is the flow's base distribution. This
+      formulation has two key advantages: first, since the base distribution is
+      normalized, we know the true log normalizing constant $C$ is zero when
+      $\beta_{t}=0$. Second, by initializing the flow parameters near zero, the
+      flow starts close to its base distribution $p_{0}$, providing a stable
+      initialization point.
+    </p>
+    <p>The tempered observations are defined as:</p>
+    $$ \begin{aligned} & \widetilde{\mathbf{X}}_{\beta_{t}}=\mathbf{X} \\ &
+    \widetilde{\mathbf{y}}_{\beta_{t}}=\left(1-\beta_{t}\right) \log
+    p_{0}(\mathbf{X})+\beta_{t} \mathbf{y} \\ &
+    \widetilde{\boldsymbol{\sigma}}_{\beta_{t}}^{2}=\max \left\{\beta_{t}^{2}
+    \boldsymbol{\sigma}^{2}, \sigma_{\min }^{2}\right\} \end{aligned} $$
+    <p>
+      We increase the inverse temperature $\beta_{t}$ according to a tempering
+      schedule increasing from $\beta_{0}=0$ to $\beta_{t_{\text{end}}}=1$,
+      where $t_{\text{end}} \leq T_{\max}$ marks the end of tempering. By
+      default, we use a linear tempering schedule:
+      $\beta_{t}=\beta_{0}+\frac{t}{t_{\text{end}}}\left(1-\beta_{0}\right)$.
+    </p>
+
+    <h3>Normalizing Flow Regression Algorithm</h3>
+    <p>
+      Having introduced the flow regression model and tempering approach, we now
+      present the complete method in Algorithm 1, which returns the flow
+      parameters $\boldsymbol{\phi}$ and the log normalizing constant $C$.
+    </p>
+
+    <div class="code-block">
+      <pre><code>Algorithm 1: Normalizing Flow Regression
+Input: Observations $(\mathbf{X}, \mathbf{y}, \boldsymbol{\sigma}^{2})$, total number of tempered steps $t_{\text{end}}$, maximum
+number of optimization iterations $T_{\max }$
+Output: Flow $T_{\phi}$ approximating the target, log normalizing constant $C$
+Compute and set the base distribution for the flow, using $(\mathbf{X}, \mathbf{y}, \boldsymbol{\sigma}^{2})$;
+for $t \leftarrow 0$ to $T_{\max}$ do
+  Set inverse temperature $\beta_{t} \in[0,1]$ according to tempering schedule $(\beta_{0}=0)$;
+  Update tempered observations $(\widetilde{\mathbf{X}}_{\beta_{t}}, \widetilde{\mathbf{y}}_{\beta_{t}}, \widetilde{\boldsymbol{\sigma}}_{\beta_{t}}^{2})$ according to tempering equations;
+  Fix $\boldsymbol{\phi}$ and optimize $C$ using fast 1D optimization with objective in Eq. 6;
+  Optimize $(\boldsymbol{\phi}, C)$ jointly using L-BFGS with objective in Eq. 6;
+end</code></pre>
+    </div>
+
+    <p>
+      We follow a two-step approach: first, we fix the flow parameters
+      $\boldsymbol{\phi}$ and optimize the scalar parameter $C$ using e.g.,
+      Brent's method, which is computationally efficient as it requires only a
+      single evaluation of the flow. Then, using this result as initialization,
+      we jointly optimize both $\boldsymbol{\phi}$ and $C$ with L-BFGS.
+    </p>
+
+    <div class="collapsible-details">
+      <button
+        class="collapsible"
+        aria-expanded="false"
+        aria-controls="flow-architecture"
+      >
+        <span class="show-text">Show Flow Architecture Details</span>
+        <span class="hide-text">Hide Flow Architecture Details</span>
+        <span class="collapsible-icon">▼</span>
+      </button>
+      <div class="content" aria-hidden="true">
+        <div class="arch-figure-container">
+          <div class="arch-figure-section">
+            <figure>
+              <img
+                src="images/flow_architecture.png"
+                alt="Normalizing Flow Architecture"
+                class="responsive-img-large"
+              />
+              <figcaption class="caption">
+                Figure 4: The architecture of Masked Autoregressive Flow used in
+                NFR. The flow transforms a simple base distribution into a
+                complex posterior distribution through a series of invertible
+                transformations.
+              </figcaption>
+            </figure>
+          </div>
+
+          <div class="arch-explanation">
+            <h4>Architecture Details</h4>
+            <p>
+              For all experiments, we use the masked autoregressive flow (MAF)
+              with the following specifications:
+            </p>
+            <ul>
+              <li>
+                11 transformation layers, each comprising an affine
+                autoregressive transform followed by a reverse permutation
+                transform
+              </li>
+              <li>
+                The flow's base distribution is a diagonal multivariate Gaussian
+                estimated from observations with sufficiently high log-density
+                values
+              </li>
+              <li>
+                The maximum scaling factor $\alpha_{\max}$ and $\mu_{\max}$ are
+                chosen to exhibit controlled flexibility from the base
+                distribution
+              </li>
+              <li>
+                The parameter set for the normalizing flow regression model is
+                $\boldsymbol{\psi}=(\boldsymbol{\phi}, C)$, where
+                $\boldsymbol{\phi}$ represents the flow parameters
+              </li>
+            </ul>
+            <p>
+              We initialize $\boldsymbol{\phi}$ by multiplying the default
+              initialization by $10^{-3}$ to ensure the flow starts close to its
+              base distribution. The parameter $C$ is initialized to zero.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Experiments</h2>
+    <p>
+      We evaluate our normalizing flow regression (NFR) method through a series
+      of experiments on both synthetic and real-world problems. These
+      experiments are designed to test NFR's effectiveness across different
+      dimensions and problem types, comparing its performance against
+      established baselines.
+    </p>
+
+    <h3>Experimental Setup</h3>
+    <p>
+      For all our experiments, we use a masked autoregressive flow architecture
+      with fixed hyperparameters. Our training data comes from log-density
+      evaluations collected during maximum a posteriori (MAP) optimization runs.
+      This reflects real-world settings where practitioners have already
+      performed optimization to find parameter point estimates.
+    </p>
+
+    <p>We compare NFR against the following baselines:</p>
+    <ul>
+      <li>
+        <strong>Laplace approximation</strong>: A Gaussian approximation using
+        the MAP estimate and numerical Hessian
+      </li>
+      <li>
+        <strong>Black-box variational inference (BBVI)</strong>: Using the same
+        flow architecture as NFR but trained through standard variational
+        inference
+      </li>
+      <li>
+        <strong>Variational sparse Bayesian quadrature (VSBQ)</strong>: A
+        state-of-the-art offline surrogate method using Gaussian processes
+      </li>
+    </ul>
+
+    <p>
+      For each problem, we allocate 3000D log-density evaluations where D is the
+      posterior dimension (number of model parameters). We evaluate the methods
+      using three metrics:
+    </p>
+    <ul>
+      <li>
+        The absolute difference between true and estimated log normalizing
+        constant (ΔLML)
+      </li>
+      <li>The mean marginal total variation distance (MMTV)</li>
+      <li>The "Gaussianized" symmetrized KL divergence (GsKL)</li>
+    </ul>
+
+    <h3>Synthetic Problems</h3>
+
+    <div class="two-column">
+      <div>
+        <h4>Multivariate Rosenbrock-Gaussian (D=6)</h4>
+        <p>
+          Our first test uses a six-dimensional synthetic target with known
+          complex geometry, combining exponentiated Rosenbrock ('banana')
+          functions and Gaussian densities. This creates a challenging
+          non-Gaussian posterior with curved correlation structure.
+        </p>
+        <p>
+          As shown in Figure 5, NFR successfully captures the complex posterior
+          shape and achieves excellent performance across all metrics,
+          outperforming all baselines. In contrast, the Laplace approximation
+          fails to capture the non-Gaussian structure, while BBVI struggles with
+          slow convergence and potential local minima.
+        </p>
+      </div>
+      <div>
+        <figure>
+          <img
+            src="images/rosenbrock_results.png"
+            alt="Multivariate Rosenbrock-Gaussian posterior visualizations"
+            class="responsive-img"
+          />
+          <figcaption class="caption">
+            Figure 5: Example contours of the marginal density for the
+            Multivariate Rosenbrock-Gaussian showing performance of different
+            methods. Ground-truth samples are in gray.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="two-column">
+      <div>
+        <h4>Lumpy (D=10)</h4>
+        <p>
+          Our second synthetic test uses a fixed instance of the lumpy
+          distribution, a mildly multimodal density represented by a mixture of
+          12 partially overlapping multivariate Gaussian components in ten
+          dimensions.
+        </p>
+        <p>
+          On this problem, all methods except Laplace perform well, with NFR
+          achieving the best overall performance. The Laplace approximation
+          provides reasonable estimates of the normalizing constant and marginal
+          distributions but struggles with the full joint distribution.
+        </p>
+      </div>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>ΔLML (↓)</th>
+              <th>MMTV (↓)</th>
+              <th>GsKL (↓)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Laplace</td>
+              <td>0.81</td>
+              <td>0.15</td>
+              <td>0.22</td>
+            </tr>
+            <tr>
+              <td>BBVI (1×)</td>
+              <td>0.42</td>
+              <td>0.065</td>
+              <td>0.029</td>
+            </tr>
+            <tr>
+              <td>BBVI (10×)</td>
+              <td>0.32</td>
+              <td>0.046</td>
+              <td>0.013</td>
+            </tr>
+            <tr>
+              <td>VSBQ</td>
+              <td>0.11</td>
+              <td>0.033</td>
+              <td>0.0070</td>
+            </tr>
+            <tr>
+              <td>NFR</td>
+              <td><strong>0.026</strong></td>
+              <td><strong>0.022</strong></td>
+              <td><strong>0.0020</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>Real-World Problems</h3>
+
+    <h4>Bayesian Timing Model (D=5)</h4>
+    <p>
+      Our first real-world application comes from cognitive neuroscience, where
+      Bayesian observer models are applied to explain human time perception.
+      These models assume that participants in psychophysical experiments are
+      performing Bayesian inference over properties of sensory stimuli. To make
+      the inference scenario more challenging and realistic, we include
+      log-likelihood estimation noise.
+    </p>
+    <p>
+      Both NFR and VSBQ accurately approximate this posterior, with NFR
+      achieving slightly better performance on the normalizing constant
+      estimation. BBVI with a larger computational budget (10×) shows worse
+      performance with larger confidence intervals, while the standard BBVI
+      fails to converge.
+    </p>
+
+    <figure>
+      <img
+        src="images/timing_model_results.png"
+        alt="Bayesian timing model posterior visualizations"
+        class="responsive-img-large"
+      />
+      <figcaption class="caption">
+        Figure 6: Posterior visualizations for the Bayesian timing model. Orange
+        contours represent the approximated posterior from NFR, while black
+        contours represent ground truth.
+      </figcaption>
+    </figure>
+
+    <h4>Lotka-Volterra Model (D=8)</h4>
+    <p>
+      Our second real-world test examines parameter inference for the
+      Lotka-Volterra predatory-prey model, a classic system of coupled
+      differential equations that describe population dynamics. We infer eight
+      parameters governing interaction rates, initial population sizes, and
+      observation noise levels.
+    </p>
+
+    <div class="two-column">
+      <div>
+        <p>
+          NFR significantly outperforms all baselines on this problem, achieving
+          the best results across all metrics. BBVI, VSBQ, and the Laplace
+          approximation achieve acceptable performance, but with notably higher
+          error in the normalizing constant estimation and posterior shape.
+        </p>
+        <p>
+          This demonstrates NFR's effectiveness on problems with moderate
+          dimensionality and complex dynamics, where accurately capturing
+          parameter correlations is crucial for valid scientific inference.
+        </p>
+      </div>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>ΔLML (↓)</th>
+              <th>MMTV (↓)</th>
+              <th>GsKL (↓)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Laplace</td>
+              <td>0.62</td>
+              <td>0.11</td>
+              <td>0.14</td>
+            </tr>
+            <tr>
+              <td>BBVI (1×)</td>
+              <td>0.47</td>
+              <td>0.055</td>
+              <td>0.029</td>
+            </tr>
+            <tr>
+              <td>BBVI (10×)</td>
+              <td>0.24</td>
+              <td>0.029</td>
+              <td>0.0087</td>
+            </tr>
+            <tr>
+              <td>VSBQ</td>
+              <td>0.95</td>
+              <td>0.085</td>
+              <td>0.060</td>
+            </tr>
+            <tr>
+              <td>NFR</td>
+              <td><strong>0.18</strong></td>
+              <td><strong>0.016</strong></td>
+              <td><strong>0.00066</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h4>Bayesian Causal Inference in Multisensory Perception (D=12)</h4>
+    <p>
+      Our final and most challenging test examines a model of multisensory
+      perception from computational neuroscience. The model describes how humans
+      decide whether visual and vestibular (balance) sensory cues share a common
+      cause - a fundamental problem in neural computation. The model's
+      likelihood is mildly expensive (>3s per evaluation), due to the numerical
+      integration required for its computation.
+    </p>
+    <p>
+      The high dimensionality and complex likelihood of this model make it
+      particularly challenging. The Laplace approximation is inapplicable due to
+      a non-positive-definite numerical Hessian, and the likelihood's
+      computational cost makes BBVI impractical. Focusing on NFR and VSBQ, we
+      find that NFR performs remarkably well on this challenging posterior, with
+      metrics near the desired thresholds, while VSBQ fails to produce a usable
+      approximation.
+    </p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th>ΔLML (↓)</th>
+          <th>MMTV (↓)</th>
+          <th>GsKL (↓)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>VSBQ</td>
+          <td>4.1e+2</td>
+          <td>0.87</td>
+          <td>2.0e+2</td>
+        </tr>
+        <tr>
+          <td>NFR</td>
+          <td><strong>0.82</strong></td>
+          <td><strong>0.13</strong></td>
+          <td><strong>0.11</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      <h3>Key Findings</h3>
+      <p>
+        Our experimental results demonstrate that NFR consistently performs well
+        across a diverse range of problems, from synthetic benchmarks to complex
+        real-world applications with up to 12 dimensions. NFR shows several
+        advantages:
+      </p>
+      <ul>
+        <li>
+          Superior or comparable performance to existing methods in terms of
+          posterior approximation accuracy
+        </li>
+        <li>Excellent normalizing constant estimation for model comparison</li>
+        <li>
+          Effective utilization of existing log-density evaluations without
+          requiring additional likelihood computations
+        </li>
+        <li>
+          Particularly strong advantages in higher-dimensional and complex
+          posterior landscapes
+        </li>
+      </ul>
+    </div>
+
+    <h2>Discussion and Conclusions</h2>
+    <p>
+      In this paper, we introduced normalizing flow regression (NFR), a novel
+      offline inference method for approximating posterior distributions. Unlike
+      traditional surrogate approaches that require additional sampling or
+      inference steps, NFR directly yields a tractable posterior approximation
+      through regression on existing log-density evaluations.
+    </p>
+    <p>
+      We showed that normalizing flows offer several advantages for this task:
+    </p>
+    <ul>
+      <li>They ensure proper probability distributions</li>
+      <li>Enable easy sampling</li>
+      <li>Scale efficiently with the number of likelihood evaluations</li>
+      <li>Can flexibly incorporate prior knowledge of posterior structure</li>
+    </ul>
+
+    <p>
+      Our empirical evaluation demonstrates that NFR effectively approximates
+      both synthetic and real-world posteriors, showing superior or comparable
+      performance to existing methods. NFR excels particularly in challenging
+      scenarios where standard methods are computationally prohibitive or where
+      existing model evaluations can be recycled.
+    </p>
+
+    <h3>Limitations</h3>
+    <p>Despite its strengths, NFR has some limitations to consider:</p>
+    <ul>
+      <li>
+        Like other surrogate methods, NFR requires the training dataset to
+        sufficiently cover regions of non-negligible probability mass, which
+        becomes challenging in high dimensions (D &gt; 15-20)
+      </li>
+      <li>
+        The quality of the approximation depends on having evaluations that
+        adequately explore the posterior landscape
+      </li>
+      <li>
+        Non-identifiability between flow parameters and the normalizing constant
+        requires careful prior specification
+      </li>
+      <li>
+        The method may be less effective for posteriors with highly irregular or
+        discontinuous density functions
+      </li>
+    </ul>
+
+    <h3>Future Work</h3>
+    <p>Several promising directions for future research include:</p>
+    <ul>
+      <li>
+        Extending NFR to incorporate other likelihood evaluation sources beyond
+        MAP optimization
+      </li>
+      <li>
+        Developing active learning strategies to sequentially acquire new
+        evaluations based on the current posterior estimate
+      </li>
+      <li>
+        Exploring more advanced flow architectures and training techniques for
+        higher-dimensional problems
+      </li>
+      <li>
+        Combining NFR with other surrogate modeling approaches for improved
+        performance
+      </li>
+      <li>
+        Applying NFR to additional scientific domains with computationally
+        expensive models
+      </li>
+    </ul>
+
+    <p>
+      Normalizing flow regression represents a promising approach for Bayesian
+      inference in settings where standard methods are computationally
+      prohibitive, offering more robust and uncertainty-aware modeling across
+      scientific and engineering applications.
+    </p>
+
+    <blockquote>
+      <p>
+        <strong>Acknowledgments:</strong> This work was supported by Research Council of Finland (grants 358980 and 356498), and by the Flagship programme: <a href="https://fcai.fi/">Finnish Center for Artificial Intelligence FCAI</a>. The authors wish to thank the Finnish Computing Competence Infrastructure (FCCI) for supporting this project with computational and data storage resources.
+      </p>
+    </blockquote>
+
+    <h2>References</h2>
+    <ol>
+      <li>
+        Acerbi, L. (2018). Variational Bayesian Monte Carlo.
+        <em>Advances in Neural Information Processing Systems</em>,
+        31:8222-8232.
+      </li>
+      <li>
+        Acerbi, L. (2020). Variational Bayesian Monte Carlo with noisy
+        likelihoods. <em>Advances in Neural Information Processing Systems</em>,
+        33:8211-8222.
+      </li>
+      <li>
+        Blei, D.M., Kucukelbir, A., and McAuliffe, J.D. (2017). Variational
+        inference: A review for statisticians.
+        <em>Journal of the American Statistical Association</em>,
+        112(518):859-877.
+      </li>
+      <li>
+        Dinh, L., Sohl-Dickstein, J., and Bengio, S. (2017). Density estimation
+        using Real NVP.
+        <em>International Conference on Learning Representations</em>.
+      </li>
+      <li>
+        Gelman, A., Carlin, J.B., Stern, H.S., Dunson, D.B., Vehtari, A., and
+        Rubin, D.B. (2013). <em>Bayesian Data Analysis</em> (3rd edition). CRC
+        Press.
+      </li>
+      <li>
+        Li, C., Clarté, G., Jørgensen, M., and Acerbi, L. (2024). Fast
+        post-process Bayesian inference with variational sparse Bayesian
+        quadrature. <em>arXiv preprint</em> arXiv:2303.05263.
+      </li>
+      <li>
+        Papamakarios, G., Pavlakou, T., and Murray, I. (2017). Masked
+        autoregressive flow for density estimation.
+        <em>Advances in Neural Information Processing Systems</em>, 30.
+      </li>
+      <li>
+        Papamakarios, G., Nalisnick, E., Rezende, D.J., Mohamed, S., and
+        Lakshminarayanan, B. (2021). Normalizing flows for probabilistic
+        modeling and inference. <em>Journal of Machine Learning Research</em>,
+        22(57):1-64.
+      </li>
+      <li>
+        Ranganath, R., Gerrish, S., and Blei, D. (2014). Black box variational
+        inference. <em>Artificial Intelligence and Statistics</em>, 814-822.
+      </li>
+      <li>
+        Rezende, D.J. and Mohamed, S. (2015). Variational inference with
+        normalizing flows.
+        <em
+          >Proceedings of the 32nd International Conference on Machine
+          Learning</em
+        >, 1530-1538.
+      </li>
+    </ol>
+    <footer>
+      <p>© 2025 Chengkun Li, Bobby Huggins, Petrus Mikkola, Luigi Acerbi</p>
+      <p>
+        Find more information at:
+        <a href="https://github.com/acerbilab">https://github.com/acerbilab</a>
+      </p>
+    </footer>
+    <!-- Back to top button -->
+    <a href="#" id="back-to-top" class="back-to-top" aria-label="Back to top">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </a>
+
+    <!-- Lightbox container -->
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+      <div class="lightbox-close" aria-label="Close lightbox">×</div>
+      <img class="lightbox-content" id="lightbox-img" src="" alt="" />
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="scripts.js"></script>
+  </body>
+</html>
