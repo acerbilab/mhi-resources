@@ -8,11 +8,11 @@ Go through the list **well in advance** before submission to ensure all the nece
   - [ ] Confirm all individuals meeting authorship criteria are included.
   - [ ] Agree on the order of authors with all co-authors.
   - [ ] Designate a corresponding author if one is required (typically the first or last author).
-- [ ] **Prepare Acknowledgments:** Draft acknowledgments section (individual funding, computing resources, etc.); can be posptoned for anonymized submissions until the camera-ready version.
+- [ ] **Prepare Acknowledgments:** Draft acknowledgments section (individual funding, computing resources, etc.); can be postponed for anonymized submissions until the camera-ready version.
 - [ ] **Prepare Conflict of Interest (COI) Disclosure:** Identify and be ready to list any COIs for all authors as per venue policy (this is often done by individual authors, e.g., on OpenReview).
 - [ ] **Check for Reciprocal Reviewing Requirements:** See if any author needs to register as a reviewer for the venue.
 - [ ] **Create Account(s) on Submission Portal:** Ensure all submitting authors have active accounts well in advance.
-- [ ] **Confirm All Co-Authors Approve the Final Version for Submission:** This is an essential ethical step.
+- [ ] **Confirm All Co-Authors Had the Chance to Approve the Final Version for Submission:** Send a near-complete draft at least a few days in advance, or follow the procedure that was agreed upon.
 
 ## II. Venue-Specific Requirements & Policies
 
@@ -36,7 +36,6 @@ Go through the list **well in advance** before submission to ensure all the nece
   - [ ] Verify no Type-3 fonts are used if disallowed (common LaTeX issue).
 - [ ] **Confirm Paper Size & Margins:** (e.g., US Letter or A4, as specified).
 - [ ] **Finalize Title & Abstract:** Ensure they are concise, accurately reflect content, and meet any length restrictions.
-- [ ] **Verify Keywords/Index Terms:** Check they are included and appropriate.
 - [ ] **Ensure Consistent Reference Formatting:** Use the venue's specified citation style if needed; check for capitalization, missing venues, etc.
 - [ ] **Plan Appendix References in Main Paper:** If appendix is separate/WIP, decide on a consistent referencing strategy (e.g., "see Appendix," "see Appendix Section X," or by topic).
 - [ ] **Check Figure/Table Placement & Captions:** Ensure they are legible, correctly numbered, and captioned as per guidelines.
@@ -71,7 +70,9 @@ Go through the list **well in advance** before submission to ensure all the nece
 
 ## VII. Online Submission System
 
-- [ ] **Enter Paper Title, Abstract, Keywords in System:** Copy-paste or type accurately.
+- [ ] **Enter Paper Title, Abstract in System:** Copy-paste or type accurately.
+- [ ] **Enter Keywords/tl;dr:** Discuss and include relevant keywords and `tl;dr`.
+- [ ] **Select Paper Category:** Discuss and select an appropriate category or categories for the paper (e.g., `Probabilistic Methods`), if requested by the system.
 - [ ] **Add All Co-Authors Correctly in the System:** Ensure names, affiliations, and email addresses are accurate as per the agreed author list and order. Confirm corresponding author designation in the system.
 - [ ] **Upload Main Manuscript PDF:** Double-check it's the final, correct, and (if applicable) anonymized version.
 - [ ] **Upload Supplementary Material (Code, Data, Appendix PDF):** Ensure all files are correctly attached in the designated sections and are anonymized if required.
