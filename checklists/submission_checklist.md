@@ -1,14 +1,15 @@
 # Machine Learning Paper Submission Checklist
 
+Go through the list **well in advance** before submission to ensure all the necessary information is available.
+
 ## I. Author-Related Information
 
 - [ ] **Finalize Author List & Order:**
   - [ ] Confirm all individuals meeting authorship criteria are included.
   - [ ] Agree on the order of authors with all co-authors.
   - [ ] Designate a corresponding author.
-- [ ] **Identify Requirements for Author Contributions Statement:** Prepare text if the venue requires detailing each author's role.
-- [ ] **Prepare Conflict of Interest (COI) Disclosure:** Identify and be ready to list any COIs for all authors as per venue policy.
 - [ ] **Prepare Acknowledgments:** Draft acknowledgments section (individual funding, computing resources, etc.); can be posptoned for anonymized submissions until the camera-ready version.
+- [ ] **Prepare Conflict of Interest (COI) Disclosure:** Identify and be ready to list any COIs for all authors as per venue policy (this is often done by individual authors, e.g., on OpenReview).
 - [ ] **Check for Reciprocal Reviewing Requirements:** See if any author needs to register as a reviewer for the venue.
 - [ ] **Create Account(s) on Submission Portal:** Ensure all submitting authors have active accounts well in advance.
 - [ ] **Confirm All Co-Authors Approve the Final Version for Submission:** This is an essential ethical step.
