@@ -7,7 +7,7 @@ Go through the list **well in advance** before submission to ensure all the nece
 - [ ] **Finalize Author List & Order:**
   - [ ] Confirm all individuals meeting authorship criteria are included.
   - [ ] Agree on the order of authors with all co-authors.
-  - [ ] Designate a corresponding author.
+  - [ ] Designate a corresponding author if one is required (typically the first or last author).
 - [ ] **Prepare Acknowledgments:** Draft acknowledgments section (individual funding, computing resources, etc.); can be posptoned for anonymized submissions until the camera-ready version.
 - [ ] **Prepare Conflict of Interest (COI) Disclosure:** Identify and be ready to list any COIs for all authors as per venue policy (this is often done by individual authors, e.g., on OpenReview).
 - [ ] **Check for Reciprocal Reviewing Requirements:** See if any author needs to register as a reviewer for the venue.
