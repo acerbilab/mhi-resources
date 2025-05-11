@@ -79,7 +79,9 @@ Go through the list **well in advance** before submission to ensure all the nece
 - [ ] **Fill Out All Required Submission Forms/Questionnaires in the Portal:** This may include COI, author contributions, reproducibility details, ethics statements, etc.
 - [ ] **Review Submission Proof/Preview:** Carefully check the system-generated proof for any conversion, formatting errors, or metadata issues before final submission.
 
-## VIII. Final Critical Checks (Before Hitting "Submit")
+## VIII. Final Critical Checks
+
+_Given how the submission process works in conferences, in which authors can keep updating the submission until the deadline, these checks are better done **after** submitting, on the actually-submitted version._
 
 - [ ] **One Last Read-Through of the PDF:** Focus on clarity, typos, and glaring errors.
 - [ ] **Verify Claims in Abstract & Introduction:** Ensure they accurately reflect the paper's contributions and scope especially if there were last-minute changes.
